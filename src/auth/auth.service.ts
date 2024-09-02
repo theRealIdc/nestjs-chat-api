@@ -5,11 +5,13 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { userPayload } from './stategy/jwt.stategy';
 import { RegisterDto } from './dto/register.dto';
+import { MailerService } from 'src/mailer.service';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
     private jwtService: JwtService,
+    private mailerService: MailerService,
   ) {}
 
   //REGISTER
@@ -33,6 +35,8 @@ export class AuthService {
         password: hashPassword,
       },
     });
+
+    await this.mailerService.SendCreationEmail({ recipient: email, name });
 
     return this.authenticateUser({ userId: newUser.id });
   }
